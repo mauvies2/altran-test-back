@@ -7,7 +7,8 @@ router.get("/register", (req, res) => res.render("register"));
 
 // Register Handle
 router.post("/register", async (req, res) => {
-  const { name, email, password, password2, role } = req.body;
+  const { name, email, password2, role } = req.body;
+  let { password } = req.body;
   let errors = [];
 
   // Check required fields
@@ -51,13 +52,23 @@ router.post("/register", async (req, res) => {
             password2,
           });
         } else {
-          database.collection("clients").insertOne({
-            name,
-            email,
-            role: role === "admincode" ? "admin" : "user",
-          });
-
-          res.render("login");
+          bcrypt.genSalt(10, (err, salt) =>
+            bcrypt.hash(password, salt, (err, hash) => {
+              if (err) throw err;
+              // Set password to hashed
+              password = hash;
+              database
+                .collection("clients")
+                .insertOne({
+                  name,
+                  email,
+                  password,
+                  role: role === "admincode" ? "admin" : "user",
+                })
+                .then(() => res.redirect("login"))
+                .catch((err) => console.log(err));
+            })
+          );
         }
       });
   }

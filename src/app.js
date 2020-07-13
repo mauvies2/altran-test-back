@@ -5,6 +5,8 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const expressLayouts = require("express-ejs-layouts");
+const flash = require("connect-flash");
+const session = require("express-session");
 
 const { startDatabase } = require("./database/mongo");
 const { getData } = require("./database/database");
@@ -34,17 +36,23 @@ app.set("view engine", "ejs");
 // bodyparser
 app.use(express.urlencoded({ extended: false }));
 
-// defining endpoints to return data
-app.use("/", require("./routes/index"));
-app.use("/users", require("./routes/users"));
-app.use("/dashboard", require("./routes/dashboard"));
+// Express session
+app.use(
+  session({
+    secret: "secret",
+    resave: true,
+    saveUninitialized: true,
+  })
+);
+
+// Connect fl
 
 app.get("/clients", async (req, res) => {
   if (Object.keys(req.query).length !== 0) {
-    if (req.query.hasOwnProperty("id")) {
+    if (req.query.hasOwnProperty("_id")) {
       res.send(
         await getData("clients").then((res) =>
-          res.filter((client) => client.id === req.query.id)
+          res.filter((client) => client._id === req.query._id)
         )
       );
     } else if (req.query.hasOwnProperty("name")) {
@@ -81,6 +89,11 @@ app.get("/policies", async (req, res) => {
     res.send(await getData("policies"));
   }
 });
+
+// defining endpoints to return data
+app.use("/", require("./routes/index"));
+app.use("/users", require("./routes/users"));
+app.use("/dashboard", require("./routes/dashboard"));
 
 startDatabase().then(async () => {
   await fetchDataToDatabase(url1, "clients");
