@@ -9,6 +9,7 @@ async function startDatabase() {
   const mongoDBURL = await mongo.getConnectionString();
   const connection = await MongoClient.connect(mongoDBURL, {
     useNewUrlParser: true,
+    useUnifiedTopology: true,
   });
   database = connection.db();
 }
