@@ -1,3 +1,52 @@
 <h1 class="mt-4">Dashboard</h1>
 <p class="lead mb-3">Welcome</p>
 <a href="/users/logout" class="btn btn-secondary">Logout</a>
+<form>
+  <div class="row">
+    <div class="col-sm">
+      <label class="col-form-label" for="inputDefault">Filter by Id</label>
+      <input
+        type="text"
+        class="form-control"
+        name="id"
+        placeholder="Enter Id"
+        id="inputDefault"
+        value="<%= typeof name != 'undefined' ? name : '' %>"
+      />
+    </div>
+    <div class="col-sm">
+      <label class="col-form-label" for="inputDefault">Filter by Name</label>
+      <input
+        type="text"
+        class="form-control"
+        name="name"
+        placeholder="Enter Name"
+        id="inputDefault"
+        value="<%= typeof name != 'undefined' ? name : '' %>"
+      />
+    </div>
+    <div class="col-sm d-flex align-content-end flex-wrap">
+      <button type="button" class="btn btn-primary mt-4">Default button</button>
+    </div>
+  </div>
+</form>
+
+<table class="table table-hover mt-4">
+  <thead>
+    <tr>
+      <th scope="col">Id</th>
+      <th scope="col">Name</th>
+      <th scope="col">Email</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% clients.map(function(client){ %>
+    <tr>
+      <th scope="row"><%= client.id %></th>
+      <td><%= client.name %></td>
+      <td><%= client.email %></td>
+    </tr>
+
+    <% }) %>
+  </tbody>
+</table>

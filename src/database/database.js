@@ -1,8 +1,8 @@
 const { getDatabase } = require("./mongo");
 
-async function insert(data, collection) {
+async function insertUser(data) {
   const database = await getDatabase();
-  return await database.collection(collection).insertMany(data);
+  return await database.collection("users").insertOne(data);
 }
 
 async function getData(collection) {
@@ -11,6 +11,6 @@ async function getData(collection) {
 }
 
 module.exports = {
-  insert,
+  insertUser,
   getData,
 };

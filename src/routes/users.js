@@ -1,28 +1,37 @@
+// Importing the dependencies
 const express = require("express");
 const router = express.Router();
-const { getDatabase } = require("../database/mongo");
 const bcrypt = require("bcryptjs");
+const flash = require("connect-flash");
+const passport = require("passport");
+
+const { getDatabase } = require("../database/mongo");
+const { getData, insertUser } = require("../database/database");
+
+// Routes
+router.get("/", async (req, res) => res.send(await getData("users")));
 router.get("/login", (req, res) => res.render("login"));
 router.get("/register", (req, res) => res.render("register"));
 
-// Register Handle
+// User register handle
 router.post("/register", async (req, res) => {
   const { name, email, password2, role } = req.body;
   let { password } = req.body;
+
   let errors = [];
 
-  // Check required fields
+  // Check all required fields
   if (!name || !email || !password || !password2) {
     errors.push({ msg: "Please fill in all fields" });
   }
 
-  // Check passwords match
+  // Check that passwords match
   if (password !== password2) {
     errors.push({ msg: "Passwords do not match" });
   }
 
   // Check password length
-  if (password.length < 6) {
+  if (password.length < 2) {
     errors.push({ msg: "Password should be at least 6 characters" });
   }
 
@@ -38,11 +47,11 @@ router.post("/register", async (req, res) => {
     // Validation passed
     const database = await getDatabase();
     database
-      .collection("clients")
+      .collection("users")
       .findOne({ email: email })
       .then((user) => {
         if (user) {
-          // User exist
+          // User exists
           errors.push({ msg: "Email is already registered" });
           res.render("register", {
             errors,
@@ -52,26 +61,47 @@ router.post("/register", async (req, res) => {
             password2,
           });
         } else {
+          // Hash password
           bcrypt.genSalt(10, (err, salt) =>
             bcrypt.hash(password, salt, (err, hash) => {
               if (err) throw err;
-              // Set password to hashed
               password = hash;
-              database
-                .collection("clients")
-                .insertOne({
-                  name,
-                  email,
-                  password,
-                  role: role === "admincode" ? "admin" : "user",
+              // Add user to in-memory database
+              insertUser({
+                name,
+                email,
+                password,
+                role: role === "admincode" ? "admin" : "user",
+              })
+                .then(() => {
+                  req.flash(
+                    "success_msg",
+                    "You are now registered and can log in"
+                  );
+                  res.redirect("login");
                 })
-                .then(() => res.redirect("login"))
                 .catch((err) => console.log(err));
             })
           );
         }
       });
   }
+});
+
+// Login handle
+router.post("/login", (req, res, next) => {
+  passport.authenticate("local", {
+    successRedirect: "/dashboard",
+    failureRedirect: "/users/login",
+    failureFlash: true,
+  })(req, res, next);
+});
+
+// Logout handle
+router.get("/logout", (req, res) => {
+  req.logout();
+  req.flash("success_msg", "You are logged out");
+  res.redirect("/users/login");
 });
 
 module.exports = router;
