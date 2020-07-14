@@ -4,7 +4,7 @@
     >Logout</a
   >
 </div>
-<h4 class="mb-0 mt-4">Search clients information by Id and name</h4>
+<h4 class="mb-0 mt-4">Search clients data by Id and name</h4>
 <form action="/dashboard/clients" method="GET">
   <div class="row">
     <div class="col-sm">
@@ -76,10 +76,35 @@
 </form>
 <table class="table table-hover mt-4">
   <thead>
+    <% if (policies) {%>
+    <tr>
+      <th scope="col">Id</th>
+      <th scope="col">Amount Insured</th>
+      <th scope="col">Email</th>
+      <th scope="col">Inception Date</th>
+      <th scope="col">Install Payment</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% policies.map(policy => { %>
+    <tr>
+      <th scope="row"><%= policy.id %></th>
+      <td><%= policy.amountInsured %></td>
+      <td><%= policy.email %></td>
+      <td><%= policy.inceptionDate %></td>
+      <td><%= policy.installmentPayment %></td>
+    </tr>
+    <% }) }%>
+  </tbody>
+</table>
+<table class="table table-hover mt-4">
+  <thead>
+    <% if (client) { %>
     <tr>
       <th scope="col">Id</th>
       <th scope="col">Name</th>
       <th scope="col">Email</th>
+      <th scope="col">Role</th>
     </tr>
   </thead>
   <tbody>
@@ -87,6 +112,8 @@
       <th scope="row"><%= client.id %></th>
       <td><%= client.name %></td>
       <td><%= client.email %></td>
+      <td><%= client.role %></td>
     </tr>
+    <% } %>
   </tbody>
 </table>

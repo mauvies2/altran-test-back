@@ -1,16 +1,16 @@
 const axios = require("axios");
+const { insert } = require("../database/database");
 
-async function fetchData(url) {
+async function fetchDataToDatabase(url, collection) {
   try {
     const response = await axios.get(url);
-    // return response;
     const data = Object.values(response.data)[0];
-    return data;
+    insert(data, collection);
   } catch (error) {
     console.log(error);
   }
 }
 
 module.exports = {
-  fetchData,
+  fetchDataToDatabase,
 };

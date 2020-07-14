@@ -2,40 +2,94 @@ const express = require("express");
 
 const router = express.Router();
 
-// Clients url
-const url2 = "http://www.mocky.io/v2/580891a4100000e8242b75c5";
+const { getDatabase } = require("../database/mongo");
 
-router.get("/", async (req, res) => {
-  const policies = await fetchData(url2);
+const { ensureAuthenticated } = require("../../config/auth");
+
+// Policies url
+
+router.get("/", ensureAuthenticated, async (req, res) => {
   let errors = [];
-  let policy;
+  let policies;
   let client;
-  // Check for query fields
-  if (req.query.id && req.query.name) {
-    const query = clients.filter(
-      (client) =>
-        client.id === req.query.id &&
-        client.name.toLowerCase() === req.query.name.toLowerCase()
-    )[0];
-    query ? (client = query) : errors.push({ msg: "No client was found" });
-  } else if (req.query.id) {
-    const query = clients.filter((client) => client.id === req.query.id)[0];
-    console.log(query);
-    query ? (client = query) : errors.push({ msg: "No client was found" });
-  } else {
-    const query = clients.filter(
-      (client) => client.name.toLowerCase() === req.query.name.toLowerCase()
-    )[0];
-    query ? (client = query) : errors.push({ msg: "No client was found" });
-  }
-  client
-    ? res.render("clients", {
-        errors,
-        client,
-      })
-    : res.render("dashboard", {
-        errors,
+  const database = await getDatabase();
+  if (req.query.name) {
+    await database
+      .collection("clients_policies")
+      .aggregate([
+        {
+          $lookup: {
+            from: "policies",
+            localField: "id",
+            foreignField: "clientId",
+            as: "policies",
+          },
+        },
+      ])
+      .toArray(function (err, arr) {
+        if (err) throw err;
+        // Check for query fields
+        const query = arr.filter(
+          (client) => client.name.toLowerCase() === req.query.name.toLowerCase()
+        )[0];
+        if (query) {
+          policies = query.policies;
+          return res.render("policies", {
+            policies,
+            client,
+          });
+        } else {
+          errors.push({
+            msg: "No client was found",
+          });
+          return res.render("dashboard", {
+            errors,
+          });
+        }
       });
+  } else if (req.query.id) {
+    await database
+      .collection("policies")
+      .aggregate([
+        {
+          $lookup: {
+            from: "clients",
+            localField: "clientId",
+            foreignField: "id",
+            as: "clientId",
+          },
+        },
+      ])
+      .toArray(function (err, arr) {
+        if (err) throw err;
+        // Check for query fields
+        // console.log(JSON.stringify(arr));
+        const query = arr.filter(
+          (policy) => policy.clientId[0].id === req.query.id
+        )[0];
+        if (query) {
+          client = query.clientId[0];
+          return res.render("policies", {
+            client,
+            policies,
+          });
+        } else {
+          errors.push({
+            msg: "Please introduce a valid policy number",
+          });
+          return res.render("dashboard", {
+            errors,
+          });
+        }
+      });
+  } else {
+    errors.push({
+      msg: "Please introduce a valid policy number",
+    });
+    return res.render("dashboard", {
+      errors,
+    });
+  }
 });
 
 module.exports = router;

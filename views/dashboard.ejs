@@ -1,7 +1,10 @@
-<h1 class="mt-4">Dashboard</h1>
-<p class="lead mb-3">Welcome</p>
-<a href="/users/logout" class="btn btn-secondary">Logout</a>
-
+<div class="row d-flex justify-content-between align-items-end">
+  <h1 class="mt-4">Welcome</h1>
+  <a href="/users/logout" class="btn btn-secondary h-25 d-inline-block"
+    >Logout</a
+  >
+</div>
+<h4 class="mb-0 mt-4">Search clients data by Id and name</h4>
 <form action="/dashboard/clients" method="GET">
   <div class="row">
     <div class="col-sm">
@@ -31,19 +34,28 @@
     </div>
   </div>
 </form>
-<form action="/dashboard/clients" method="GET">
+<h4 class="mb-0 mt-4">Search client's policies by name</h4>
+<form action="/dashboard/policies" method="GET">
   <div class="row">
     <div class="col-sm">
       <label class="col-form-label" for="inputDefault">Filter by name</label>
       <input
         type="text"
         class="form-control"
-        name="id"
-        placeholder="Enter Id"
-        id="id"
-        value="<%= typeof id != 'undefined' ? id : '' %>"
+        name="name"
+        placeholder="Enter client's name"
+        id="name"
+        value="<%= typeof name != 'undefined' ? name : '' %>"
       />
     </div>
+    <div class="col-sm d-flex align-content-end flex-wrap">
+      <button type="submit" class="btn btn-primary mt-4">Search</button>
+    </div>
+  </div>
+</form>
+<h4 class="mb-0 mt-4">Search client's data by policy number</h4>
+<form action="/dashboard/policies" method="GET">
+  <div class="row">
     <div class="col-sm">
       <label class="col-form-label" for="inputDefault"
         >Filter by Policy number</label
@@ -51,10 +63,10 @@
       <input
         type="text"
         class="form-control"
-        name="name"
-        placeholder="Enter Name"
-        id="name"
-        value="<%= typeof name != 'undefined' ? name : '' %>"
+        name="id"
+        placeholder="Enter policy number"
+        id="id"
+        value="<%= typeof id != 'undefined' ? id : '' %>"
       />
     </div>
     <div class="col-sm d-flex align-content-end flex-wrap">

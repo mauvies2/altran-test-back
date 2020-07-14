@@ -1,6 +1,6 @@
 // Importing the dependencies
 const express = require("express");
-// const bodyParser = require("body-parser");
+const bodyparser = require("body-parser");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
@@ -14,14 +14,20 @@ const passport = require("passport");
 require("../config/passport")(passport);
 
 const { startDatabase } = require("./database/mongo");
+const { fetchDataToDatabase } = require("./API/fetchData");
 
 const app = express();
+
+app.use(bodyparser.urlencoded({ extended: false }));
+
+const url1 = "http://www.mocky.io/v2/5808862710000087232b75ac";
+const url2 = "http://www.mocky.io/v2/580891a4100000e8242b75c5";
 
 // Adding Helmet to enhance your API's security
 app.use(helmet());
 
 // Using bodyParser to parse JSON bodies into JS objects
-// app.use(bodyParser.json());
+app.use(bodyparser.json());
 
 // Enabling CORS for all requests
 app.use(cors());
@@ -65,8 +71,13 @@ app.use("/", require("./routes/index"));
 app.use("/users", require("./routes/users"));
 app.use("/dashboard", require("./routes/dashboard"));
 app.use("/dashboard/clients", require("./routes/clients"));
+app.use("/dashboard/policies", require("./routes/policies"));
 
 startDatabase().then(async () => {
+  await fetchDataToDatabase(url1, "clients");
+  await fetchDataToDatabase(url2, "policies");
+  await fetchDataToDatabase(url1, "clients_policies");
+
   // starting the server
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, async () => {

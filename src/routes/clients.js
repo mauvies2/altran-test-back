@@ -1,11 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { fetchData } = require("../API/fetchData");
+const { getData } = require("../database/database");
 
-const url1 = "http://www.mocky.io/v2/5808862710000087232b75ac";
+const { ensureAuthenticated } = require("../../config/auth");
 
-router.get("/", async (req, res) => {
-  const clients = await fetchData(url1);
+router.get("/", ensureAuthenticated, async (req, res) => {
+  console.log(req.user.name);
+  const clients = await getData("clients");
   let errors = [];
   let client;
   // Check for query fields

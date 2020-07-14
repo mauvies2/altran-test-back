@@ -1,4 +1,5 @@
 const LocalStrategy = require("passport-local").Strategy;
+const { getData } = require("../src/database/database");
 const { getDatabase } = require("../src/database/mongo");
 
 const bcrypt = require("bcryptjs");
@@ -25,7 +26,6 @@ module.exports = function (passport) {
               if (err) throw err;
 
               if (isMatch) {
-                console.log("match");
                 return done(null, user);
               } else {
                 return done(null, false, { message: "Password incorrect" });
@@ -42,10 +42,9 @@ module.exports = function (passport) {
   });
 
   passport.deserializeUser(async (id, done) => {
-    console.log(id);
     const User = await getDatabase();
-    User.collection("users").find({}, (err, user) => {
-      done(err, user);
+    User.collection("users").findOne({}, async (err, user) => {
+      return done(err, user);
     });
   });
 };
