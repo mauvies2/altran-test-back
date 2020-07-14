@@ -64,7 +64,7 @@ app.use((req, res, next) => {
 app.use("/", require("./routes/index"));
 app.use("/users", require("./routes/users"));
 app.use("/dashboard", require("./routes/dashboard"));
-app.use("/clients", require("./routes/clients"));
+app.use("/dashboard/clients", require("./routes/clients"));
 
 startDatabase().then(async () => {
   // starting the server

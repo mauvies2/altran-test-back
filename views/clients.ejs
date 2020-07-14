@@ -1,7 +1,6 @@
 <h1 class="mt-4">Dashboard</h1>
 <p class="lead mb-3">Welcome</p>
 <a href="/users/logout" class="btn btn-secondary">Logout</a>
-
 <form action="/dashboard/clients" method="GET">
   <div class="row">
     <div class="col-sm">
@@ -11,7 +10,7 @@
         class="form-control"
         name="id"
         placeholder="Enter Id"
-        id="id"
+        id="inputDefault"
         value="<%= typeof id != 'undefined' ? id : '' %>"
       />
     </div>
@@ -22,7 +21,7 @@
         class="form-control"
         name="name"
         placeholder="Enter Name"
-        id="name"
+        id="inputDefault"
         value="<%= typeof name != 'undefined' ? name : '' %>"
       />
     </div>
@@ -62,4 +61,19 @@
     </div>
   </div>
 </form>
-<%-include ("./partials/messages") %>
+<table class="table table-hover mt-4">
+  <thead>
+    <tr>
+      <th scope="col">Id</th>
+      <th scope="col">Name</th>
+      <th scope="col">Email</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><%= client.id %></th>
+      <td><%= client.name %></td>
+      <td><%= client.email %></td>
+    </tr>
+  </tbody>
+</table>
