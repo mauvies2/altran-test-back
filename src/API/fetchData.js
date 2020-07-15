@@ -7,7 +7,7 @@ async function fetchDataToDatabase(url, collection) {
     const data = Object.values(response.data)[0];
     insert(data, collection);
   } catch (error) {
-    console.log(error);
+    return alert(error);
   }
 }
 

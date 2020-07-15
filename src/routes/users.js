@@ -6,10 +6,9 @@ const flash = require("connect-flash");
 const passport = require("passport");
 
 const { getDatabase } = require("../database/mongo");
-const { getData, insertUser } = require("../database/database");
+const { insertUser } = require("../database/database");
 
 // Routes
-router.get("/", async (req, res) => res.send(await getData("users")));
 router.get("/login", (req, res) => res.render("login"));
 router.get("/register", (req, res) => res.render("register"));
 
@@ -31,8 +30,8 @@ router.post("/register", async (req, res) => {
   }
 
   // Check password length
-  if (password.length < 2) {
-    errors.push({ msg: "Password should be at least 6 characters" });
+  if (password.length < 4) {
+    errors.push({ msg: "Password should be at least 4 characters" });
   }
 
   if (errors.length > 0) {

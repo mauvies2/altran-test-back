@@ -3,19 +3,18 @@ const express = require("express");
 const router = express.Router();
 
 const { getDatabase } = require("../database/mongo");
-
 const { ensureAuthenticated } = require("../../config/auth");
-
-// Policies url
 
 router.get("/", ensureAuthenticated, async (req, res) => {
   let errors = [];
   let policies;
   let client;
   const database = await getDatabase();
+  // Check for query fields and filter
   if (req.query.name) {
     await database
-      .collection("clients_policies")
+      .collection("clients")
+      // Integrate both collection with the Id related field
       .aggregate([
         {
           $lookup: {
@@ -26,8 +25,9 @@ router.get("/", ensureAuthenticated, async (req, res) => {
           },
         },
       ])
-      .toArray(function (err, arr) {
+      .toArray((err, arr) => {
         if (err) throw err;
+
         // Check for query fields
         const query = arr.filter(
           (client) => client.name.toLowerCase() === req.query.name.toLowerCase()
@@ -50,6 +50,7 @@ router.get("/", ensureAuthenticated, async (req, res) => {
   } else if (req.query.id) {
     await database
       .collection("policies")
+      // Integrate both collection (inverse way) with the Id related field
       .aggregate([
         {
           $lookup: {
@@ -60,10 +61,9 @@ router.get("/", ensureAuthenticated, async (req, res) => {
           },
         },
       ])
-      .toArray(function (err, arr) {
+      .toArray((err, arr) => {
         if (err) throw err;
         // Check for query fields
-        // console.log(JSON.stringify(arr));
         const query = arr.filter(
           (policy) => policy.clientId[0].id === req.query.id
         )[0];

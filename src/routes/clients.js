@@ -5,11 +5,10 @@ const { getData } = require("../database/database");
 const { ensureAuthenticated } = require("../../config/auth");
 
 router.get("/", ensureAuthenticated, async (req, res) => {
-  console.log(req.user.name);
   const clients = await getData("clients");
   let errors = [];
   let client;
-  // Check for query fields
+  // Check for query fields and filter
   if (req.query.id && req.query.name) {
     const query = clients.filter(
       (client) =>
